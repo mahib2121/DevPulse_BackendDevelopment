@@ -5,8 +5,6 @@ import { createUser, findUserByEmail } from "./auth.service";
 import { validateSignup, validateLogin } from "./auth.validation";
 
 export const signup = async (req: Request, res: Response) => {
-  console.log("Hit signup");
-
   try {
     const error = validateSignup(req.body);
 
@@ -48,7 +46,6 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  console.log("Hit login");
   try {
     const error = validateLogin(req.body);
 

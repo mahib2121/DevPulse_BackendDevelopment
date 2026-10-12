@@ -54,23 +54,27 @@ export const getIssueById = async (id: number) => {
 
 export const updateIssue = async (
   id: number,
-  title: string,
-  description: string,
-  type: string,
+  fields: { title?: string; description?: string; type?: string },
 ) => {
-  const result = await pool.query(
-    `
+  const keys = Object.keys(fields);
+  const values = Object.values(fields);
+
+  if (keys.length === 0) {
+    return await getIssueById(id);
+  }
+
+  const setClause = keys
+    .map((key, index) => `${key} = $${index + 1}`)
+    .join(", ");
+
+  const query = `
     UPDATE issues
-    SET
-      title = $1,
-      description = $2,
-      type = $3,
-      updated_at = CURRENT_TIMESTAMP
-    WHERE id = $4
+    SET ${setClause}, updated_at = CURRENT_TIMESTAMP
+    WHERE id = $${keys.length + 1}
     RETURNING *
-    `,
-    [title, description, type, id],
-  );
+  `;
+
+  const result = await pool.query(query, [...values, id]);
 
   return result.rows[0];
 };
